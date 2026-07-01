@@ -1,0 +1,191 @@
+Ready for review
+Select text to add comments on the plan
+Backend + Admin Dashboard for Crevio IT Website
+Context
+The site (crevio-nextjs, Next.js 15 App Router + React 19 + TS + Tailwind 4) is currently 100% static — all content lives in src/data/siteData.ts as hardcoded arrays, with icons stored as imported React components (LucideIcon / react-icons IconType). There is no database, API, or auth.
+
+The goal: make every content block CRUD-manageable from a protected admin dashboard so non-developers can edit content without redeploying. This requires (1) a database + models, (2) a REST API, (3) admin-only authentication, (4) an image upload path, (5) an icon strategy that replaces "component references" with storable strings that the frontend resolves dynamically, and (6) refactoring the public site to read from the DB instead of siteData.ts.
+
+Chosen stack (confirmed with user)
+Backend: Next.js Route Handlers in the same app (src/app/api/**).
+Database: MongoDB + Mongoose.
+Media: UploadThing (uploadthing.com) — store returned file URLs/keys in Mongo.
+Auth: Custom JWT + credentials (bcrypt-hashed), single seeded admin, httpOnly cookie.
+Key design principle
+Public pages (server components) read the DB directly via Mongoose query helpers (no HTTP round-trip) and pass data down to client section components as props.
+The REST API exists primarily for the dashboard (interactive CRUD) and is guarded by auth.
+Dependencies to add
+mongoose                      # ODM
+bcryptjs  @types/bcryptjs     # password hashing
+jose                          # JWT sign/verify (Edge-compatible, needed in middleware)
+zod                           # shared validation (API + forms)
+react-hook-form @hookform/resolvers   # dashboard forms
+uploadthing @uploadthing/react        # media uploads
+(clsx, tailwind-merge, swiper, framer-motion already present.)
+
+Environment variables (.env.local, add .env.example with names only)
+MONGODB_URI=
+JWT_SECRET=
+ADMIN_EMAIL=
+ADMIN_PASSWORD=          # used once by the seed script
+UPLOADTHING_TOKEN=
+NEXT_PUBLIC_APP_URL=
+Folder structure to add
+src/
+  lib/
+    db/
+      connect.ts              # cached Mongoose connection (Next hot-reload safe)
+      models/                 # one file per collection (see below)
+      queries.ts              # server-side read helpers for public pages
+    auth/
+      jwt.ts                  # sign/verify with jose
+      password.ts             # bcrypt hash/compare
+      session.ts              # get/set/clear the httpOnly cookie, getCurrentAdmin()
+    validation/               # zod schemas per resource (shared API + forms)
+    api-helpers.ts            # json(), requireAdmin(), error handling wrapper
+  types/
+    content.ts                # shared TS interfaces (mirror models, icon = string object)
+  components/
+    ui/DynamicIcon.tsx        # client: resolves {library,name,color} -> icon component
+    dashboard/                # form fields, IconPicker, ImageUploader, DataTable, etc.
+  app/
+    api/
+      auth/login/route.ts
+      auth/logout/route.ts
+      auth/me/route.ts
+      uploadthing/route.ts    # + core.ts file router
+      nav-items/route.ts            nav-items/[id]/route.ts
+      hero-stats/route.ts           hero-stats/[id]/route.ts
+      services/route.ts             services/[id]/route.ts
+      strengths/route.ts            strengths/[id]/route.ts
+      portfolio/route.ts            portfolio/[id]/route.ts
+      process-steps/route.ts        process-steps/[id]/route.ts
+      technologies/route.ts         technologies/[id]/route.ts
+      testimonials/route.ts         testimonials/[id]/route.ts
+      pricing-plans/route.ts        pricing-plans/[id]/route.ts
+      faqs/route.ts                 faqs/[id]/route.ts
+      blog-posts/route.ts           blog-posts/[id]/route.ts
+      social-links/route.ts         social-links/[id]/route.ts
+    login/page.tsx            # admin login form
+    (dashboard)/dashboard/    # route group, protected by middleware
+      layout.tsx              # sidebar nav + logout
+      page.tsx                # overview
+      <resource>/page.tsx     # list + create/edit/delete per resource
+  middleware.ts               # protect /dashboard/** and mutating /api/**
+scripts/
+  seed.ts                     # create admin + import current siteData values
+Data models & TypeScript interfaces
+Shared types live in src/types/content.ts and are the single source of truth; Mongoose schemas mirror them. Every icon field becomes an object of strings, never a component reference:
+
+// Icon reference stored in DB and resolved on the client
+export type IconRef = {
+  library: "lucide" | "react-icons/si" | "react-icons/fa" | "react-icons/fa6"
+         | "react-icons/di" | "react-icons/tb" | "react-icons/bi";  // extendable
+  name: string;   // e.g. "Github" (lucide) or "SiReact" (react-icons)
+  color?: string; // hex, e.g. "#61DAFB" — used by technologies/social
+};
+Common fields on every collection: _id, order (number, for drag/manual sort), createdAt, updatedAt. Public queries sort by order.
+
+Collection	Fields (beyond order/timestamps)
+NavItem	label, href, isActive
+HeroStat	value:number, suffix, label
+Service	title, description, icon:IconRef, isActive
+Strength	title, description, icon:IconRef, isActive
+PortfolioItem	slug(unique), title, category(enum), year, description, metrics, accent(gradient class), images:[{url,key,alt}], links:[{type:"github-client"|"github-server"|"live"|"docs"|"custom", label, url}], challenge,solution,result (case-study body), published:bool, featured:bool
+ProcessStep	title, description
+Technology	name, icon:IconRef (with color), isActive
+Testimonial	name, role, company, quote, rating:number?, avatarUrl?, published:bool, featured:bool
+PricingPlan	name, price, description, features:[string], featured:bool
+Faq	question, answer, isActive
+BlogPost	slug(unique), title, excerpt, content?, category, date, coverImage:{url,key}?, links:[{platform, url}], published:bool, featured:bool
+SocialLink	label, url, icon:IconRef, isActive
+AdminUser	email(unique), passwordHash, role:"admin"
+Notes:
+
+published/featured on testimonials and blogPosts exactly match the request: public queries return only published:true; featured:true gets the golden/premium styling (add a Tailwind class branch in the section render).
+Portfolio links and blog links are editable arrays in the dashboard (add/remove rows), fulfilling "add or delete links from the dashboard."
+Icon strategy (the critical piece)
+Today icons are component references — unstorable in a DB. We store IconRef strings and resolve them at render time with a single client component.
+
+src/components/ui/DynamicIcon.tsx (client):
+
+"use client";
+import { lazy, Suspense, useMemo } from "react";
+// map library string -> lazy module loader (whole subpackage lazy-loaded once)
+const loaders: Record<string, () => Promise<any>> = {
+  "lucide": () => import("lucide-react"),
+  "react-icons/si": () => import("react-icons/si"),
+  "react-icons/fa": () => import("react-icons/fa"),
+  "react-icons/fa6": () => import("react-icons/fa6"),
+  // ...extendable
+};
+export function DynamicIcon({ library, name, color, className }: IconRef & { className?: string }) {
+  const Cmp = useMemo(() => lazy(async () => {
+    const mod = await loaders[library]?.();
+    const Icon = mod?.[name];
+    return { default: Icon ?? (() => null) };
+  }), [library, name]);
+  return <Suspense fallback={<span className={className} />}>
+    <Cmp className={className} style={color ? { color } : undefined} />
+  </Suspense>;
+}
+Matches the user's described formats: react-icons/si + SiReact + #61DAFB; lucide + Github.
+Section components stop doing const Icon = item.icon; <Icon/> and instead render <DynamicIcon {...item.icon} className="h-7 w-7" />.
+Dashboard IconPicker: two selects/inputs (library + icon name) + a color input, with a live <DynamicIcon> preview so the admin sees the icon before saving. (Optional enhancement: searchable name list per library.)
+API design
+RESTful, one folder per resource. Standard shape:
+
+GET /api/<resource> — list. Public callers get active/published only; authenticated admin gets all (detected via cookie).
+POST /api/<resource> — admin only — create (zod-validated).
+GET /api/<resource>/[id] — single.
+PATCH /api/<resource>/[id] — admin only — update.
+DELETE /api/<resource>/[id] — admin only — delete.
+Optional PATCH /api/<resource>/reorder — bulk order update for sortable lists.
+src/lib/api-helpers.ts provides requireAdmin(req) (verifies JWT cookie, 401 otherwise), a json() helper, and a try/catch wrapper mapping zod errors → 400. Every mutating handler calls requireAdmin first.
+
+Auth routes:
+
+POST /api/auth/login — validate {email,password} against AdminUser, bcrypt.compare, on success sign JWT and set httpOnly/secure/sameSite cookie.
+POST /api/auth/logout — clear cookie.
+GET /api/auth/me — return current admin or 401.
+Uploads:
+
+src/app/api/uploadthing/core.ts — file router with middleware that calls requireAdmin (only admins can upload), returns file {url,key}.
+src/app/api/uploadthing/route.ts — exports the handler.
+Dashboard ImageUploader uses @uploadthing/react; portfolio stores multiple {url,key}, blog stores one coverImage.
+Authentication & protection
+Hashing: bcryptjs in src/lib/auth/password.ts.
+JWT: jose in src/lib/auth/jwt.ts (Edge-compatible — required because middleware runs on Edge). Payload { sub, email, role }, ~7d expiry.
+Session: httpOnly + secure + sameSite=lax cookie (e.g. crevio_admin).
+src/middleware.ts: matches /dashboard/:path*. Verifies the cookie's JWT; if invalid/absent → redirect to /login. (API mutation guards live in requireAdmin at the handler, not middleware, so public GETs stay open.)
+Single admin: No public signup. scripts/seed.ts creates the admin from ADMIN_EMAIL/ADMIN_PASSWORD. "Only our admin can access" is satisfied by there being exactly one seeded account and no registration route.
+Frontend refactor (siteData.ts → DB)
+For each section, replace the siteData import with data passed as props from a server component that calls src/lib/db/queries.ts (direct Mongoose reads, sort({order}), filter isActive/published). Representative changes:
+
+src/views/HomePage.tsx (server) fetches all home sections' data and passes to each section component.
+Icon-rendering sections switch to <DynamicIcon>:
+Services/ServicesSection.tsx, WhyChoose/WhyChooseSection.tsx (lucide),
+Technologies/TechnologiesSection.tsx (react-icons + color),
+layout/Footer.tsx social links (currently a local socialLinks array pointing to example.com — moves to SocialLink collection).
+Portfolio/PortfolioSection.tsx, app/case-study/[id]/page.tsx, views/CaseStudyPage.tsx read portfolio from DB; generateStaticParams → query slugs (or switch to dynamic rendering / revalidate).
+Hero.tsx heroStats, Process/ProcessSection.tsx, Testimonials/TestimonialsSection.tsx (respect published, style featured), Pricing/PricingSection.tsx, FAQ/FAQSection.tsx, Blog/BlogSection.tsx, Navbar.tsx.
+Keep siteData.ts temporarily as the seed source, then remove once the DB is populated.
+Because content now comes from the DB, set export const revalidate = <n> (or dynamic = "force-dynamic") on public pages so edits appear without redeploy.
+
+Seed / migration
+scripts/seed.ts (run once): connects to Mongo, creates the admin user, and imports every current siteData.ts array — translating each icon component to its IconRef. Example mappings: SiReact → {library:"react-icons/si", name:"SiReact", color:"#61DAFB"}, footer Globe2 → {library:"lucide", name:"Globe2"}. This guarantees zero content loss and gives immediate real data to build the dashboard against.
+
+Suggested implementation order
+Infra: add deps, .env, lib/db/connect.ts, models, types/content.ts, zod schemas.
+Auth: password/jwt/session helpers, login/logout/me routes, middleware.ts, scripts/seed.ts (admin only first), /login page.
+Icon system: DynamicIcon.tsx + dashboard IconPicker.
+API: resource route handlers + requireAdmin + uploadthing router.
+Seed content from siteData, then dashboard CRUD pages per resource.
+Refactor public sections to read from DB via queries.ts + DynamicIcon.
+Remove siteData.ts once verified.
+Verification
+npm run seed populates Mongo; log in at /login with the seeded admin — wrong password rejected, /dashboard unreachable when logged out (middleware redirects to /login).
+In the dashboard: create/edit/delete one item in each resource; confirm technologies icon+color preview renders, portfolio image upload (UploadThing) returns a URL, and portfolio/blog link rows can be added/removed.
+Public site: each section renders DB data with correct icons; unpublished testimonials/blog posts are hidden; featured items show premium styling; edits appear after revalidate.
+curl a mutating endpoint (e.g. POST /api/services) without the auth cookie → expect 401; with a valid cookie → succeeds.
+npm run build passes (no leftover siteData type errors, no server/client boundary violations from DynamicIcon).
