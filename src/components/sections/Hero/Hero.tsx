@@ -106,7 +106,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 32, filter: "blur(18px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.9, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display max-w-4xl text-balance text-5xl tracking-[-0.05em] text-white sm:text-5xl md:text-6xl xl:text-7xl"
+            className="font-display max-w-4xl text-balance text-4xl tracking-[-0.05em] text-white sm:text-5xl md:text-6xl xl:text-7xl"
           >
             We Transform Ideas Into Digital Reality.
           </motion.h1>
@@ -131,15 +131,15 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[560px] lg:mx-0">
-          <div className="relative aspect-[5/4] w-full">
+        <div className="relative mx-auto w-full min-w-0 max-w-[560px] lg:mx-0">
+          <div className="flex min-w-0 flex-col gap-6 lg:block lg:aspect-5/4 lg:gap-0">
             {/* Shape 1 — big: running code editor */}
             <motion.div
               style={{ x: visualX, y: visualY }}
               initial={{ opacity: 0, y: 60, scale: 0.94 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 1, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute right-12 top-0 w-[82%] overflow-hidden rounded-xl border border-white/12 bg-[#070b16]/95 shadow-[0_50px_130px_rgba(0,0,0,0.7)] backdrop-blur-xl"
+              className="relative w-full min-w-0 max-w-full overflow-hidden rounded-xl border border-white/12 bg-[#070b16]/95 shadow-[0_50px_130px_rgba(0,0,0,0.7)] backdrop-blur-xl lg:absolute lg:right-12 lg:top-0 lg:w-[82%]"
             >
               <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.04] px-4 py-3">
                 <div className="flex gap-2">
@@ -245,7 +245,7 @@ export function Hero() {
                 x: { duration: 0.8, delay: 0.62 },
                 y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
               }}
-              className="absolute -bottom-4 right-10 w-[58%] min-w-[210px] overflow-hidden rounded-xl border border-white/12 bg-white/[0.07] p-5 shadow-[0_36px_100px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+              className="relative mx-auto w-[85%] max-w-[280px] overflow-hidden rounded-xl border border-white/12 bg-white/[0.07] p-5 shadow-[0_36px_100px_rgba(0,0,0,0.55)] backdrop-blur-2xl lg:absolute lg:-bottom-4 lg:right-10 lg:mx-0 lg:w-[58%] lg:min-w-[210px] lg:max-w-none"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
