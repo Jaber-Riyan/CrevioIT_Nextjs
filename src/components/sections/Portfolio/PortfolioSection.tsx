@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Reveal } from "@/components/animations/Reveal";
 import { portfolioItems } from "@/data/siteData";
@@ -15,10 +15,22 @@ type PortfolioSectionProps = {
 
 export function PortfolioSection({ compact = false }: PortfolioSectionProps) {
   const [active, setActive] = useState("All");
+  const sliderRef = useRef<HTMLDivElement>(null);
   const filtered = useMemo(
     () => portfolioItems.filter((item) => active === "All" || item.category === active).slice(0, compact ? 4 : portfolioItems.length),
     [active, compact]
   );
+
+  const scrollBy = (direction: number) => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    slider.scrollBy({ left: direction * slider.clientWidth, behavior: "smooth" });
+  };
+
+  const filterButtonClass = (category: string) =>
+    `px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${
+      active === category ? "bg-white text-blue-600" : "border border-white/15 bg-slate-950/30 text-white hover:border-white/40"
+    }`;
 
   return (
     <section className="relative overflow-hidden bg-[#070a11] pb-24 text-white md:pb-32">
@@ -35,16 +47,49 @@ export function PortfolioSection({ compact = false }: PortfolioSectionProps) {
               Browse premium placeholder case studies that show the type of websites, apps, dashboards, branding, and SaaS products Crevio IT creates.
             </p>
           </Reveal>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
+          {/* Mobile: horizontal slider showing ~2 categories at a time with arrows */}
+          <div className="mt-10 flex items-center gap-2 sm:hidden">
+            <button
+              type="button"
+              aria-label="Previous categories"
+              onClick={() => scrollBy(-1)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/25 bg-slate-950/30 text-white"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div
+              ref={sliderRef}
+              className="flex flex-1 snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActive(category)}
+                  className={`shrink-0 basis-[calc(50%-0.375rem)] snap-start px-2! text-[10px]! tracking-[0.12em]! ${filterButtonClass(category)}`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              aria-label="Next categories"
+              onClick={() => scrollBy(1)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/25 bg-slate-950/30 text-white"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+          {/* Larger screens: wrapped filter row */}
+          <div className="mt-10 hidden flex-wrap justify-center gap-3 sm:flex">
             {categories.map((category) => (
               <button
                 key={category}
                 type="button"
                 data-cursor
                 onClick={() => setActive(category)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${
-                  active === category ? "bg-white text-blue-600" : "border border-white/15 bg-slate-950/30 text-white hover:border-white/40"
-                }`}
+                className={filterButtonClass(category)}
               >
                 {category}
               </button>

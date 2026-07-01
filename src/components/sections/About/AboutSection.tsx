@@ -43,13 +43,13 @@ export function AboutSection() {
           </div>
           <Reveal direction="left" className="relative">
             <div className="absolute -inset-6 bg-blue-600/20 blur-3xl" />
-            <div className="relative overflow-hidden border border-white/10 bg-white/[0.04] p-7 shadow-[0_40px_110px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-              <div className="absolute right-7 top-7 flex h-16 w-16 items-center justify-center bg-blue-600 text-white shadow-[0_0_40px_rgba(53,94,255,0.62)]">
-                <Rocket className="h-8 w-8" />
+            <div className="relative overflow-hidden border border-white/10 bg-white/[0.04] p-5 shadow-[0_40px_110px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-7">
+              <div className="absolute right-5 top-5 flex h-12 w-12 items-center justify-center bg-blue-600 text-white shadow-[0_0_40px_rgba(53,94,255,0.62)] sm:right-7 sm:top-7 sm:h-16 sm:w-16">
+                <Rocket className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              <div className="h-52 bg-[linear-gradient(135deg,#142050,#05080f)] p-6">
-                <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-300">Strategy to launch</p>
-                <h3 className="mt-8 max-w-sm text-4xl font-black tracking-[-0.05em]">One team for the complete digital product journey.</h3>
+              <div className="bg-[linear-gradient(135deg,#142050,#05080f)] p-6">
+                <p className="pr-16 text-xs font-bold uppercase tracking-[0.3em] text-blue-300">Strategy to launch</p>
+                <h3 className="mt-6 max-w-sm text-2xl font-black tracking-[-0.04em] sm:mt-8 sm:text-4xl sm:tracking-[-0.05em]">One team for the complete digital product journey.</h3>
               </div>
               <div className="mt-5 grid gap-4">
                 {pillars.map((pillar) => {
