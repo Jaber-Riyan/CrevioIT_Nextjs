@@ -3,7 +3,7 @@ Select text to add comments on the plan
 Backend + Admin Dashboard for Crevio IT Website
 
 Context
-The site (crevio-nextjs, Next.js 15 App Router + React 19 + TS + Tailwind 4) is currently 100% static — all content lives in src/data/siteData.ts as hardcoded arrays, with icons stored as imported React components (LucideIcon / react-icons IconType). There is no database, API, or auth.
+The site (crevioit, Next.js 15 App Router + React 19 + TS + Tailwind 4) is currently 100% static — all content lives in src/data/siteData.ts as hardcoded arrays, with icons stored as imported React components (LucideIcon / react-icons IconType). There is no database, API, or auth.
 
 The goal: make every content block CRUD-manageable from a protected admin dashboard so non-developers can edit content without redeploying. This requires (1) a database + models, (2) a REST API, (3) admin-only authentication, (4) an image upload path, (5) an icon strategy that replaces "component references" with storable strings that the frontend resolves dynamically, and (6) refactoring the public site to read from the DB instead of siteData.ts.
 
