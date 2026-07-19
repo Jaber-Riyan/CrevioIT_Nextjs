@@ -3,11 +3,12 @@
 import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/animations/Reveal";
-import { portfolioItems } from "@/data/siteData";
+import { categories as category, portfolioItems } from "@/data/siteData";
 
-const categories = ["All", "Website", "Mobile App", "Dashboard", "Branding", "SaaS", "Case Studies"];
+const categories = category
 
 type PortfolioSectionProps = {
   compact?: boolean;
@@ -17,7 +18,7 @@ export function PortfolioSection({ compact = false }: PortfolioSectionProps) {
   const [active, setActive] = useState("All");
   const sliderRef = useRef<HTMLDivElement>(null);
   const filtered = useMemo(
-    () => portfolioItems.filter((item) => active === "All" || item.category === active).slice(0, compact ? 4 : portfolioItems.length),
+    () => portfolioItems.filter((item) => active === "All" || item.category === active).slice(0, compact ? 6 : portfolioItems.length),
     [active, compact]
   );
 
@@ -111,38 +112,42 @@ export function PortfolioSection({ compact = false }: PortfolioSectionProps) {
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="group overflow-hidden border border-white/10 bg-[#080c14]"
               >
-                <Link href={`/case-study/${item.id}`} className="block">
-                  <div className={`relative h-72 overflow-hidden bg-gradient-to-br ${item.accent}`}>
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.34),transparent_18%),linear-gradient(135deg,rgba(0,0,0,0.05),rgba(0,0,0,0.55))]" />
-                    <motion.div
-                      className="absolute left-8 top-10 w-[78%] border border-white/15 bg-[#050914]/85 p-4 shadow-[0_25px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl"
-                      whileHover={{ y: -10, rotate: -1 }}
-                    >
-                      <div className="h-24 bg-white/[0.08]" />
-                      <div className="mt-4 grid grid-cols-3 gap-2">
-                        <span className="h-12 bg-blue-400/80" />
-                        <span className="h-12 bg-white/[0.08]" />
-                        <span className="h-12 bg-white/[0.08]" />
-                      </div>
-                    </motion.div>
+                <a href={item.link} target="_blank" rel="noopener noreferrer" className="block">
+                  <div className="relative h-72 overflow-hidden bg-[#0a0f1a]">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080c14] via-transparent to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
                       <span className="bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-blue-600">{item.category}</span>
                       <span className="text-xs font-bold text-white/80">{item.year}</span>
                     </div>
                   </div>
-                  <div className="p-7">
+                  <div className="p-3">
                     <div className="flex items-start justify-between gap-6">
                       <h3 className="text-2xl font-black tracking-[-0.04em] text-white">{item.title}</h3>
                       <ArrowUpRight className="h-6 w-6 shrink-0 text-blue-400 transition group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </div>
                     <p className="mt-4 text-sm leading-7 text-slate-400">{item.description}</p>
-                    <p className="mt-6 text-sm font-bold text-blue-300">{item.metrics}</p>
                   </div>
-                </Link>
+                </a>
               </motion.article>
             ))}
           </AnimatePresence>
         </motion.div>
+        {compact && portfolioItems.length > 6 && (
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-blue-600"
+            >
+              See More
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
