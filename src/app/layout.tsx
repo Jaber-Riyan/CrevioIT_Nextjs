@@ -34,6 +34,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={archivo.variable}>
+      <head>
+        <link rel="icon" href="/crevio-logo.svg" type="image/svg+xml" />
+      </head>
       <body>
         <AppShell>{children}</AppShell>
       </body>
