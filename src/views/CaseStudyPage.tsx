@@ -25,7 +25,7 @@ export function CaseStudyPage({ id }: { id: string }) {
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">{item.description}</p>
             </Reveal>
             <Reveal direction="left">
-              <div className={`h-96 bg-gradient-to-br ${item.accent} p-8 shadow-[0_40px_120px_rgba(0,0,0,0.5)]`}>
+              <div className="h-96 bg-gradient-to-br from-blue-600 to-cyan-400 p-8 shadow-[0_40px_120px_rgba(0,0,0,0.5)]">
                 <div className="h-full border border-white/15 bg-[#050914]/80 p-6 backdrop-blur-xl">
                   <p className="text-xs font-bold uppercase tracking-[0.24em] text-blue-200">Result</p>
                   <p className="mt-5 text-5xl font-black tracking-[-0.06em]">{item.metrics}</p>
