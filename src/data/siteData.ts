@@ -27,7 +27,6 @@ import {
   SiDocker,
   SiFigma,
   SiFirebase,
-  SiFlutter,
   SiFramer,
   SiMongodb,
   SiNextdotjs,
@@ -140,6 +139,8 @@ export const strengths: IconItem[] = [
   { title: "Future-Ready Technologies", description: "We choose stacks that help you ship faster today and scale tomorrow.", icon: Rocket },
 ];
 
+export const categories = ["All", "Website", "Mobile App"];
+
 export type PortfolioItem = {
   id: string;
   title: string;
@@ -147,63 +148,98 @@ export type PortfolioItem = {
   year: string;
   description: string;
   metrics: string;
-  accent: string;
+  image: string;
+  link: string;
 };
 
 export const portfolioItems: PortfolioItem[] = [
   {
-    id: "aurora-commerce",
-    title: "Aurora Commerce",
+    id: "1",
+    title: "Travelfly - Travel Agency",
     category: "Website",
-    year: "2026",
-    description: "A cinematic ecommerce storefront with guided discovery, premium product storytelling, and faster checkout.",
-    metrics: "+41% conversion lift",
-    accent: "from-blue-500 to-cyan-400",
+    year: "2025",
+    description:
+      "A modern travel booking website with seamless tour discovery, destination highlights, and an effortless booking experience.",
+    metrics: "+45% booking increase",
+    image: "/Project_1.png",
+    link: "https://www.behance.net/gallery/252581297/Travel-Agency-Website-design",
   },
   {
-    id: "pulsebank-mobile",
-    title: "PulseBank Mobile",
+    id: "2",
+    title: "Prepmytype - PTE Preparation",
+    category: "Website",
+    year: "2025",
+    description:
+      "An interactive PTE preparation platform featuring practice tests, study resources, and progress tracking for better exam performance.",
+    metrics: "10k+ active students",
+    image: "/Project_2.png",
+    link: "https://www.behance.net/gallery/252680139/AI-Powered-PTE-Preparation-Platform",
+  },
+  {
+    id: "3",
+    title: "Sleeknit - E-commerce",
+    category: "Website",
+    year: "2025",
+    description:
+      "A clean and responsive e-commerce website for all types products with intuitive navigation and a smooth shopping experience.",
+    metrics: "+38% conversion rate",
+    image: "/Project_1_Sleeknit.png",
+    link: "https://sleeknit.com",
+  },
+  {
+    id: "4",
+    title: "Sleeknit - E-commerce Play Store",
     category: "Mobile App",
     year: "2025",
-    description: "A secure fintech app with streamlined onboarding, biometric flows, and real-time spending intelligence.",
-    metrics: "4.9 app rating",
-    accent: "from-indigo-500 to-violet-500",
+    description:
+      "A clean and responsive e-commerce website for all types products with intuitive navigation and a smooth shopping experience.",
+    metrics: "+38% conversion rate",
+    image: "/Project_4.png",
+    link: "https://play.google.com/store/apps/details?id=com.sleeknit.app&pcampaignid=web_share",
   },
   {
-    id: "orbit-ops",
-    title: "OrbitOps Command",
-    category: "Dashboard",
-    year: "2026",
-    description: "A high-density logistics dashboard designed for dispatch accuracy, live fleet state, and rapid decisions.",
-    metrics: "32% faster workflows",
-    accent: "from-sky-500 to-blue-600",
-  },
-  {
-    id: "neonforge",
-    title: "NeonForge Identity",
-    category: "Branding",
+    id: "5",
+    title: "Lyfuber - Ride Sharing",
+    category: "Mobile App",
     year: "2025",
-    description: "A bold brand system for an AI infrastructure startup, from visual identity to investor-ready launch assets.",
-    metrics: "Series A launch",
-    accent: "from-fuchsia-500 to-blue-500",
+    description:
+      "A clean and responsive e-commerce website for all types products with intuitive navigation and a smooth shopping experience.",
+    metrics: "+38% conversion rate",
+    image: "/Project_5.png",
+    link: "https://www.gogodriver.us",
   },
   {
-    id: "clarity-saas",
-    title: "Clarity SaaS",
-    category: "SaaS",
-    year: "2026",
-    description: "A subscription analytics platform with role-based workspaces, billing, onboarding, and customer success loops.",
-    metrics: "MVP in 10 weeks",
-    accent: "from-blue-600 to-emerald-400",
-  },
-  {
-    id: "medflow-case",
-    title: "MedFlow Case Study",
-    category: "Case Studies",
+    id: "6",
+    title: "Sleeknit - E-commerce App Store",
+    category: "Mobile App",
     year: "2025",
-    description: "A healthcare booking product rebuilt for trust, accessibility, and frictionless appointment management.",
-    metrics: "58% fewer drop-offs",
-    accent: "from-blue-500 to-sky-400",
+    description:
+      "A clean and responsive e-commerce website for all types products with intuitive navigation and a smooth shopping experience.",
+    metrics: "+38% conversion rate",
+    image: "/Project_3.png",
+    link: "https://apps.apple.com/us/app/sleeknit/id6779087355",
+  },
+  {
+    id: "7",
+    title: "OOTMS - Track Load Platform",
+    category: "Website",
+    year: "2025",
+    description:
+      "A logistics management platform designed to simplify load tracking, shipment monitoring, and transportation workflows.",
+    metrics: "28% faster dispatch",
+    image: "/Project_6.png",
+    link: "https://www.behance.net/gallery/252739655/Track-Driver-website",
+  },
+  {
+    id: "8",
+    title: "Coastal - Car Rental Website",
+    category: "Website",
+    year: "2025",
+    description:
+      "A sleek car rental website that makes browsing vehicles, checking availability, and booking rentals fast and hassle-free.",
+    metrics: "4.8 user rating",
+    image: "/Project_7.png",
+    link: "https://moizmemon.vercel.app",
   },
 ];
 
